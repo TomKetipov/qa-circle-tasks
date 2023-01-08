@@ -1,5 +1,6 @@
 package core;
 
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
@@ -11,8 +12,8 @@ public class BaseTest {
         app.startBrowser();
     }
 
-//    @AfterMethod
-//    public void tearDown() {
-//        app.quit();
-//    }
+    @AfterMethod
+    public void tearDown() {
+        app.quit();
+    }
 }
