@@ -1,12 +1,14 @@
 package pages;
 
-import org.openqa.selenium.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.Set;
 
 public class BasePage {
     protected WebDriver driver;
@@ -20,6 +22,20 @@ public class BasePage {
         driver.navigate().to(url);
     }
 
+    public String getPageURL() {
+        return driver.getCurrentUrl();
+    }
+
+    public void refreshPage() {
+        driver.navigate().refresh();
+    }
+
+    protected String getAttributeValue(WebElement element, String attributeKey) {
+        waitForElementVisibility(element);
+        return element.getAttribute(attributeKey);
+    }
+
+    // Waits
     protected void waitForElementVisibility(WebElement elementToBeVisible) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(elementToBeVisible));
@@ -30,29 +46,42 @@ public class BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(elementToBeVisible));
     }
 
-    protected String getText(WebElement elementToGetText) {
+    public String getText(WebElement elementToGetText) {
         waitForElementVisibility(elementToGetText);
         return elementToGetText.getText();
     }
 
-    protected void switchToIframe(WebElement iFrameElement) {
-        waitForElementVisibility(iFrameElement);
-        driver.switchTo().frame(iFrameElement);
+    protected void clickElement(WebElement element) {
+        waitForElementToBeClickable(element);
+        element.click();
     }
 
-    public void dragNDropWithLocators(WebElement source, WebElement target) {
-        waitForElementToBeClickable(source);
-        waitForElementVisibility(target);
-
-        Actions action = new Actions(driver);
-        action.dragAndDrop(source, target).build().perform();
+    protected void typeText(WebElement element, String text) {
+        waitForElementVisibility(element);
+        element.clear();
+        element.sendKeys(text);
     }
 
-    public void html5Drag(WebElement source, WebElement target) {
-        waitForElementToBeClickable(source);
-        waitForElementVisibility(target);
+    public void switchToWindow(String windowHandle) {
+        driver.switchTo().window(windowHandle);
+    }
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("function createEvent(typeOfEvent) {\n" + "var event =document.createEvent(\"CustomEvent\");\n" + "event.initCustomEvent(typeOfEvent,true, true, null);\n" + "event.dataTransfer = {\n" + "data: {},\n" + "setData: function (key, value) {\n" + "this.data[key] = value;\n" + "},\n" + "getData: function (key) {\n" + "return this.data[key];\n" + "}\n" + "};\n" + "return event;\n" + "}\n" + "\n" + "function dispatchEvent(element, event,transferData) {\n" + "if (transferData !== undefined) {\n" + "event.dataTransfer = transferData;\n" + "}\n" + "if (element.dispatchEvent) {\n" + "element.dispatchEvent(event);\n" + "} else if (element.fireEvent) {\n" + "element.fireEvent(\"on\" + event.type, event);\n" + "}\n" + "}\n" + "\n" + "function simulateHTML5DragAndDrop(element, destination) {\n" + "var dragStartEvent =createEvent('dragstart');\n" + "dispatchEvent(element, dragStartEvent);\n" + "var dropEvent = createEvent('drop');\n" + "dispatchEvent(destination, dropEvent,dragStartEvent.dataTransfer);\n" + "var dragEndEvent = createEvent('dragend');\n" + "dispatchEvent(element, dragEndEvent,dropEvent.dataTransfer);\n" + "}\n" + "\n" + "var source = arguments[0];\n" + "var destination = arguments[1];\n" + "simulateHTML5DragAndDrop(source,destination);", source, target);
+    public String getCurrentWindowHandle() {
+        return driver.getWindowHandle();
+    }
+
+    public Set<String> getWindowHandles() {
+        return driver.getWindowHandles();
+    }
+
+    public String getTitle() {
+        return driver.getTitle();
+    }
+
+    // Actions
+    protected void hoverOverElement(WebElement element) {
+        waitForElementVisibility(element);
+        Actions actions = new Actions(driver);
+        actions.moveToElement(element).build().perform();
     }
 }

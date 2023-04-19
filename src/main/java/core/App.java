@@ -1,40 +1,47 @@
 package core;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import pages.HerokuAppPage;
-import pages.JQueryPage;
+import org.openqa.selenium.chrome.ChromeOptions;
+import pages.DynamicControlsPage;
+import pages.HoverPage;
+import pages.WindowsPage;
 
 
 public class App {
     private WebDriver driver;
-    private static final String RESOURCES_PATH = "src/main/resources/drivers/";
-
-    // Driver Paths
-    private final String WINDOWS_CHROME_DRIVER_PATH = RESOURCES_PATH + "windows-chromedriver.exe";
-    private final String LINUX_CHROME_DRIVER_PATH = RESOURCES_PATH + "linux-chromedriver-108";
-
-    private JQueryPage jQueryPage;
-    private HerokuAppPage herokuAppPage;
+    private HoverPage hoverPage;
+    private WindowsPage windowsPage;
+    private DynamicControlsPage dynamicControlsPage;
 
     // instantiating methods for the pages
-    public JQueryPage jQueryPage() {
-        if (jQueryPage == null) {
-            jQueryPage = new JQueryPage(driver);
+    public HoverPage hoversPage() {
+        if (hoverPage == null) {
+            hoverPage = new HoverPage(driver);
         }
-        return jQueryPage;
+        return hoverPage;
     }
 
-    public HerokuAppPage herokuAppPage() {
-        if (herokuAppPage == null) {
-            herokuAppPage = new HerokuAppPage(driver);
+    public WindowsPage windowsPage() {
+        if (windowsPage == null) {
+            windowsPage = new WindowsPage(driver);
         }
-        return herokuAppPage;
+        return windowsPage;
+    }
+
+    public DynamicControlsPage dynamicControlsPage() {
+        if (dynamicControlsPage == null) {
+            dynamicControlsPage = new DynamicControlsPage(driver);
+        }
+        return dynamicControlsPage;
     }
 
     public void startBrowser() {
-        System.setProperty("webdriver.chrome.driver", LINUX_CHROME_DRIVER_PATH);
-        driver = new ChromeDriver();
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
+        driver = new ChromeDriver(options);
         driver.manage().window().maximize();
     }
 
